@@ -3,7 +3,7 @@
 const fs = require("fs");
 const stream = require("stream");
 const util = require("util");
-const aribts = require("../index");
+const aribts = require("../");
 const TsStream = aribts.TsStream;
 const TsUtil = aribts.TsUtil;
 
