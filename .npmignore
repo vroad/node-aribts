@@ -1,0 +1,10 @@
+node_modules
+*.m2ts
+*.tar
+*.log
+*.swp
+*.tmp
+
+/src
+/test
+/sample
