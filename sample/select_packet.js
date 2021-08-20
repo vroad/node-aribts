@@ -2,7 +2,7 @@
 
 const fs = require("fs");
 const stream = require("stream");
-const aribts = require("../index");
+const aribts = require("../");
 const TsStream = aribts.TsStream;
 
 if (process.argv < 4) {

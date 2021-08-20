@@ -1,12 +1,9 @@
-"use strict";
+export class TsBuffer {
+    chunks: Buffer[] = [];
+    length = 0;
+    entireLength: number;
 
-class TsBuffer {
-    constructor() {
-        this.chunks = [];
-        this.length = 0;
-    }
-
-    add(chunk) {
+    add(chunk: Buffer) {
         this.chunks.push(chunk);
         this.length += chunk.length;
     }
@@ -20,5 +17,3 @@ class TsBuffer {
         return Buffer.concat(this.chunks);
     }
 }
-
-module.exports = TsBuffer;

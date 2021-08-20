@@ -1,4 +1,4 @@
-module.exports = [
+export const crc32Table = [
     0x00000000,
     0x04C11DB7,
     0x09823B6E,
