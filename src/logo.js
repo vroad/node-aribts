@@ -1,6 +1,6 @@
 "use strict";
 
-const crc = require("crc");
+const { crc32 } = require("@node-rs/crc32");
 const logoClut = require("./logo_clut");
 
 let plteBuffer, trnsBuffer;
@@ -23,7 +23,7 @@ let plteBuffer, trnsBuffer;
         plteBuffer.writeUInt8(palette[2], bytesWritten++);
     }
 
-    plteBuffer.writeInt32BE(crc.crc32(plteBuffer.slice(4, bytesWritten)), bytesWritten);
+    plteBuffer.writeInt32BE(crc32(plteBuffer.slice(4, bytesWritten)), bytesWritten);
 
     // tRNS chunk
     trnsBuffer = Buffer.alloc(4 + 4 + logoClut.length + 4);
@@ -38,7 +38,7 @@ let plteBuffer, trnsBuffer;
         trnsBuffer.writeUInt8(palette[3], bytesWritten++);
     }
 
-    trnsBuffer.writeInt32BE(crc.crc32(trnsBuffer.slice(4, bytesWritten)), bytesWritten);
+    trnsBuffer.writeInt32BE(crc32(trnsBuffer.slice(4, bytesWritten)), bytesWritten);
 }
 
 class TsLogo {
