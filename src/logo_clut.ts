@@ -1,4 +1,4 @@
-module.exports = [
+const logoClut = [
     [0  , 0  , 0  , 255],
     [255, 0  , 0  , 255],
     [0  , 255, 0  , 255],
@@ -129,3 +129,5 @@ module.exports = [
     [255, 255, 85 , 128],
     [255, 255, 255, 128]
 ];
+
+export = logoClut;

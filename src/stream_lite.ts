@@ -3,7 +3,7 @@ import { TsInfo } from "./info";
 import TsPacket = require("./packet");
 import tsTable = require("./table");
 
-export class TsStreamLite extends Writable {
+class TsStreamLite extends Writable {
     packetSize = 188;
     info: { [pid: number]: TsInfo } = {};
 
@@ -317,3 +317,5 @@ export class TsStreamLite extends Writable {
         callback();
     }
 }
+
+export = TsStreamLite;

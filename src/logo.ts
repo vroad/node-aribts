@@ -1,12 +1,11 @@
-"use strict";
+import { crc32 } from "@node-rs/crc32";
+import logoClut = require("./logo_clut");
 
-const { crc32 } = require("@node-rs/crc32");
-const logoClut = require("./logo_clut");
-
-let plteBuffer, trnsBuffer;
+let plteBuffer: Buffer;
+let trnsBuffer: Buffer;
 
 {
-    let bytesWritten;
+    let bytesWritten: number;
 
     // PLTE chunk
     plteBuffer = Buffer.alloc(4 + 4 + logoClut.length * 3 + 4);
@@ -42,13 +41,16 @@ let plteBuffer, trnsBuffer;
 }
 
 class TsLogo {
-    constructor(buffer) {
-        this.buffer = buffer;
+    constructor(public buffer: Uint8Array) {
     }
 
     decode() {
-        let pngBufferList = [this.buffer.slice(0, 33), plteBuffer, trnsBuffer, this.buffer.slice(33)];
-        let pngBufferLength = this.buffer.length + plteBuffer.length + trnsBuffer.length;
+        return TsLogo.decode(this.buffer);
+    }
+
+    static decode(buffer: Uint8Array): Uint8Array {
+        let pngBufferList = [buffer.slice(0, 33), plteBuffer, trnsBuffer, buffer.slice(33)];
+        let pngBufferLength = buffer.length + plteBuffer.length + trnsBuffer.length;
 
         let pngBuffer = Buffer.concat(pngBufferList, pngBufferLength);
 
@@ -56,4 +58,4 @@ class TsLogo {
     }
 }
 
-module.exports = TsLogo;
+export = TsLogo;
