@@ -1,8 +1,12 @@
-"use strict";
+type Year = number;
+type Month = number;
+type Day = number;
+type Hour = number;
+type Minute = number;
+type Second = number;
 
 class TsDate {
-    constructor(buffer) {
-        this.buffer = buffer;
+    constructor(public buffer: Uint8Array) {
     }
 
     decode() {
@@ -12,7 +16,7 @@ class TsDate {
         return new Date(date[0], date[1] - 1, date[2], time[0], time[1], time[2]);
     }
 
-    decodeDate() {
+    decodeDate(): [Year, Month, Day] {
         let buffer = this.buffer.length === 2 ? this.buffer : this.buffer.slice(0, 2);
         let mjd, k, year, month, day;
 
@@ -30,7 +34,7 @@ class TsDate {
         return [year, month, day];
     }
 
-    decodeTime() {
+    decodeTime(): [Hour, Minute, Second] {
         let buffer = this.buffer.length === 3 ? this.buffer : this.buffer.slice(2);
         let hour, minite, second;
 
@@ -41,7 +45,7 @@ class TsDate {
         return [hour, minite, second];
     }
 
-    decodeOffset() {
+    decodeOffset(): [Hour, Minute] {
         let hour, minite;
 
         hour = (this.buffer[0] >> 4) * 10 + (this.buffer[0] & 0x0F);
@@ -51,4 +55,4 @@ class TsDate {
     }
 }
 
-module.exports = TsDate;
+export = TsDate;
