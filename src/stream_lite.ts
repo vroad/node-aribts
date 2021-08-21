@@ -1,7 +1,7 @@
 import { Writable } from "stream";
 import { TsInfo } from "./info";
-const TsPacket = require("./packet");
-const tsTable = require("./table");
+import TsPacket = require("./packet");
+import tsTable = require("./table");
 
 export class TsStreamLite extends Writable {
     packetSize = 188;
@@ -11,7 +11,7 @@ export class TsStreamLite extends Writable {
         super();
     }
 
-    _write(buffer: Buffer, encoding: string, callback: Function) {
+    _write(buffer: Uint8Array, encoding: string, callback: Function) {
         const length = buffer.byteLength;
         const packetSize = this.packetSize;
 

@@ -1,16 +1,63 @@
-"use strict";
+import TsReader = require("./reader");
+import TsWriter = require("./writer");
 
-const TsReader = require("./reader");
-const TsWriter = require("./writer");
+interface Packet {
+    _raw: Uint8Array;
+
+    sync_byte: number;
+    transport_error_indicator: number;
+    payload_unit_start_indicator: number;
+    transport_priority: number;
+    PID: number;
+    transport_scrambling_control: number;
+    adaptation_field_control: number;
+    continuity_counter: number;
+
+    adaptation_field?: AdaptationField;
+    data_byte?: Uint8Array;
+}
+
+interface AdaptationField {
+    _raw: Uint8Array;
+
+    adaptation_field_length: number;
+
+    discontinuity_indicator?: number;
+    random_access_indicator?: number;
+    elementary_stream_priority_indicator?: number;
+    PCR_flag?: number;
+    OPCR_flag?: number;
+    splicing_point_flag?: number;
+    transport_private_data_flag?: number;
+    adaptation_field_extension_flag?: number;
+
+    program_clock_reference_base?: number;
+    program_clock_reference_extension?: number;
+    original_program_clock_reference_base?: number;
+    original_program_clock_reference_extension?: number;
+    splice_countdown?: number;
+    transport_private_data_length?: number;
+    private_data_byte?: Uint8Array;
+    adaptation_field_extension_length?: number;
+    ltw_flag?: number;
+    piecewise_rate_flag?: number;
+    seamless_splice_flag?: number;
+    ltw_valid_flag?: number;
+    ltw_offset?: number;
+    piecewise_rate?: number;
+    splice_type?: number;
+    DTS_next_AU_32_30?: number;
+    DTS_next_AU_29_15?: number;
+    DTS_next_AU_14_0?: number;
+}
 
 class TsPacket {
-    constructor(buffer) {
-        this.buffer = buffer;
+    constructor(public buffer: Uint8Array) {
     }
 
-    decode() {
-        let reader = new TsReader(this.buffer);
-        let objPacket = {};
+    decode(): Packet {
+        const reader = new TsReader(this.buffer);
+        const objPacket: Partial<Packet> = {};
 
         objPacket._raw = this.buffer;
 
@@ -32,15 +79,15 @@ class TsPacket {
             objPacket.data_byte = this.buffer.slice(reader.position >> 3, 188);
         }
 
-        return objPacket;
+        return objPacket as Packet;
     }
 
-    decodeAdaptationField() {
-        let buffer = TsPacket.getAdaptationField(this.buffer);
-        if (buffer === null) return {};
+    decodeAdaptationField(): AdaptationField {
+        const buffer = TsPacket.getAdaptationField(this.buffer);
+        if (buffer === null) return undefined;
 
-        let reader = new TsReader(buffer);
-        let objAF = {};
+        const reader = new TsReader(buffer);
+        const objAF: Partial<AdaptationField> = {};
 
         objAF._raw = buffer;
 
@@ -101,11 +148,11 @@ class TsPacket {
             }
         }
 
-        return objAF;
+        return objAF as AdaptationField;
     }
 
-    decodeBasic() {
-        let objPacket = {};
+    decodeBasic(): Packet {
+        const objPacket: Partial<Packet> = {};
 
         objPacket._raw = this.buffer;
 
@@ -119,7 +166,7 @@ class TsPacket {
         objPacket.continuity_counter = this.buffer[3] & 0x0F;
 
         if (objPacket.adaptation_field_control === 0b10 || objPacket.adaptation_field_control === 0b11) {
-            let objAF = objPacket.adaptation_field = {};
+            const objAF = objPacket.adaptation_field = {} as AdaptationField;
 
             objAF.adaptation_field_length = this.buffer[4];
 
@@ -135,11 +182,11 @@ class TsPacket {
             }
         }
 
-        return objPacket;
+        return objPacket as Packet;
     }
 
-    encode(objPacket) {
-        let writer = new TsWriter(this.buffer);
+    encode(objPacket: Packet): Uint8Array {
+        const writer = new TsWriter(this.buffer);
 
         writer.bslbf(8, 0x47);
         writer.bslbf(1, 0);
@@ -151,7 +198,7 @@ class TsPacket {
         writer.uimsbf(4, objPacket.continuity_counter);
 
         if (objPacket.adaptation_field_control === 0b10 || objPacket.adaptation_field_control === 0b11) {
-            let objAF = objPacket.adaptation_field;
+            const objAF = objPacket.adaptation_field;
 
             writer.uimsbf(8, objAF.adaptation_field_length);
             if (objAF.adaptation_field_length > 0) {
@@ -217,10 +264,10 @@ class TsPacket {
         return this.buffer.slice(0, 188);
     }
 
-    static isPes(buffer) {
+    static isPes(buffer: Uint8Array): boolean {
         if ((buffer[3] & 0x10) >> 4 === 0) return null;
 
-        let offset = (buffer[3] & 0x20) >> 5 === 1 ? 5 + buffer[4] : 4;
+        const offset = (buffer[3] & 0x20) >> 5 === 1 ? 5 + buffer[4] : 4;
 
         if (buffer[offset] === 0x00 && buffer[offset + 1] === 0x00 && buffer[offset + 2] === 0x01) {
             return true;
@@ -229,13 +276,13 @@ class TsPacket {
         }
     }
 
-    static getAdaptationField(buffer) {
+    static getAdaptationField(buffer: Uint8Array): Uint8Array {
         if ((buffer[3] & 0x20) >> 5 === 0) return null;
 
         return buffer.slice(4, 5 + buffer[4]);
     }
 
-    static getData(buffer) {
+    static getData(buffer: Uint8Array): Uint8Array {
         if ((buffer[3] & 0x10) >> 4 === 0) return null;
 
         if ((buffer[3] & 0x20) >> 5 === 1) {
@@ -246,4 +293,4 @@ class TsPacket {
     }
 }
 
-module.exports = TsPacket;
+export = TsPacket;

@@ -1,9 +1,9 @@
 export class TsBuffer {
-    chunks: Buffer[] = [];
+    chunks: Uint8Array[] = [];
     length = 0;
     entireLength: number;
 
-    add(chunk: Buffer) {
+    add(chunk: Uint8Array) {
         this.chunks.push(chunk);
         this.length += chunk.length;
     }

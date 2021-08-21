@@ -57,7 +57,7 @@ class TsReader {
     readBytesRaw(length: number) {
         if (this.position + length > this.buffer.length << 3) {
             this.position += length;
-            return Buffer.alloc(0);
+            return new Uint8Array(0);
         }
 
         const start = this.position >> 3;
@@ -68,7 +68,9 @@ class TsReader {
     }
 
     readBytes(length: number) {
-        return Buffer.from(this.readBytesRaw(length));
+        // return Buffer.from(this.readBytesRaw(length));
+        // testing
+        return this.readBytesRaw(length);
     }
 
     next(length: number) {
