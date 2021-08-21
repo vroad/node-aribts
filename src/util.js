@@ -1,5 +1,3 @@
-"use strict";
-
 const TsChar = require("./char");
 const TsDate = require("./date");
 const TsEpg = require("./epg");

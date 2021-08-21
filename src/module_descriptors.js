@@ -1,5 +1,3 @@
-"use strict";
-
 const tsModuleDescriptor = require("./module_descriptor");
 
 class TsModuleDescriptors {

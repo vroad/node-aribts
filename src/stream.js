@@ -1,15 +1,12 @@
-import { Transform } from "stream";
-import { TsInfo } from "./info";
-import { TsBuffer } from "./buffer";
+const { Transform } = require("stream");
+const { TsInfo } = require("./info");
+const { TsBuffer } = require("./buffer");
 const TsPacket = require("./packet");
 const tsTable = require("./table");
 
 class TsStream extends Transform {
-    constructor(options) {
+    constructor(options = {}) {
         super();
-
-        // TODO: Default parameters
-        options = options || {};
 
         this.options = Object.assign({
             transform: false,

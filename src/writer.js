@@ -1,5 +1,3 @@
-"use strict";
-
 class TsWriter {
     constructor(buffer, position) {
         this.buffer = buffer;
