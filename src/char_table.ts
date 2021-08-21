@@ -1,4 +1,4 @@
-module.exports = {
+const charTable = {
     ascii: {
         0x21: [0x81, 0x49],
         0x22: [0x81, 0x68],
@@ -718,3 +718,5 @@ module.exports = {
         0x764B: [129, 172]
     }
 };
+
+export = charTable;

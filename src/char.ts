@@ -1,7 +1,5 @@
-"use strict";
-
-const iconv = require("iconv-lite");
-const charTable = require("./char_table");
+import { decode } from "iconv-lite";
+import charTable = require("./char_table");
 
 const charCode = {
     hiragana: 0x30,
@@ -28,24 +26,24 @@ const charMode = {
 };
 
 class TsChar {
-    constructor(buffer) {
-        this.buffer = buffer;
-        this.position = 0;
+    position = 0;
 
-        this.graphic = [charCode.kanji, charCode.ascii, charCode.hiragana, charCode.katakana];
-        this.graphicMode = [charMode.graphic, charMode.graphic, charMode.graphic, charMode.graphic];
-        this.graphicByte = [2, 1, 1, 1];
-        this.graphicL = 0;
-        this.graphicR = 2;
-        this.graphicNormal = true;
+    graphic = [charCode.kanji, charCode.ascii, charCode.hiragana, charCode.katakana];
+    graphicMode = [charMode.graphic, charMode.graphic, charMode.graphic, charMode.graphic];
+    graphicByte: [number, number, number, number] = [2, 1, 1, 1];
+    graphicL = 0;
+    graphicR = 2;
+    graphicNormal = true;
 
-        this.sjis = [];
+    sjis: number[] = [];
+
+    constructor(public buffer: Uint8Array) {
     }
 
     decode() {
         try {
             while (this.position < this.buffer.length) {
-                let byte = this.buffer[this.position];
+                const byte = this.buffer[this.position];
 
                 if (byte <= 0x20) {
                     // C0
@@ -67,7 +65,7 @@ class TsChar {
             // avoid
         }
 
-        return iconv.decode(Buffer.from(this.sjis), "shift-jis");
+        return decode(Buffer.from(this.sjis), "shift-jis");
     }
 
     readC0() {
@@ -312,26 +310,24 @@ class TsChar {
     }
 
     readESC() {
-        let byte, byte2, byte3, byte4;
-
-        byte = this.getNext();
+        const byte = this.getNext();
 
         if (byte === 0x24) {
-            byte2 = this.getNext();
+            const byte2 = this.getNext();
 
             if (byte2 >= 0x28 && byte2 <= 0x2B) {
-                byte3 = this.getNext();
+                const byte3 = this.getNext();
 
                 if (byte3 === 0x20) {
                     // DRCS
-                    byte4 = this.getNext();
+                    const byte4 = this.getNext();
 
                     this.graphic[byte2 - 0x28] = byte4;
                     this.graphicMode[byte2 - 0x28] = charMode.drcs;
                     this.graphicByte[byte2 - 0x28] = 2;
                 } else if (byte3 === 0x28) {
                     // Ohter
-                    byte4 = this.getNext();
+                    const byte4 = this.getNext();
 
                     this.graphic[byte2 - 0x28] = byte4;
                     this.graphicMode[byte2 - 0x28] = charMode.other;
@@ -349,10 +345,10 @@ class TsChar {
                 this.graphicByte[0] = 2;
             }
         } else if (byte >= 0x28 && byte <= 0x2B) {
-            byte2 = this.getNext();
+            const byte2 = this.getNext();
 
             if (byte2 === 0x20) {
-                byte3 = this.getNext();
+                const byte3 = this.getNext();
 
                 this.graphic[byte - 0x28] = byte3;
                 this.graphicMode[byte - 0x28] = charMode.drcs;
@@ -376,7 +372,7 @@ class TsChar {
     }
 
     readSS2() {
-        let holdL = this.graphicL;
+        const holdL = this.graphicL;
 
         this.graphicL = 2;
         this.readGL();
@@ -384,7 +380,7 @@ class TsChar {
     }
 
     readSS3() {
-        let holdL = this.graphicL;
+        const holdL = this.graphicL;
 
         this.graphicL = 3;
         this.readGL();
@@ -403,26 +399,21 @@ class TsChar {
         return this.buffer[this.position++];
     }
 
-    getSjis(first, second) {
+    getSjis(first: number, second: number): number[] {
         if (first >= 0x75 && second >= 0x21) {
-            let ret = [];
-            let code = (first << 8) | second;
+            const code = (first << 8) | second;
 
             if (code >= 0x7521 && code <= 0x764B) {
-                ret = charTable.gaiji_2[code];
+                return charTable.gaiji_2[code];
             } else if (code >= 0x7A4D && code <= 0x7E7D) {
-                ret = charTable.gaiji_1[code];
+                return charTable.gaiji_1[code];
             }
-
-            if (ret === void 0) {
-                ret = [];
-            }
-
-            return ret;
+            
+            return [];
         }
 
-        let row = first < 0x5F ? 0x70 : 0xB0;
-        let cell = first & 1 ? (second > 0x5F ? 0x20 : 0x1F) : 0x7E;
+        const row = first < 0x5F ? 0x70 : 0xB0;
+        const cell = first & 1 ? (second > 0x5F ? 0x20 : 0x1F) : 0x7E;
 
         first = (((first + 1) >> 1) + row) & 0xFF;
         second = (second + cell) & 0xFF;
@@ -431,4 +422,4 @@ class TsChar {
     }
 }
 
-module.exports = TsChar;
+export = TsChar;
