@@ -1,7 +1,5 @@
 class TsReader {
-    constructor(public buffer: Buffer, public position = 0) {
-        this.buffer = buffer;
-        this.position = position || 0;
+    constructor(public buffer: Uint8Array, public position = 0) {
     }
 
     readBitsRaw(length: number) {
@@ -13,9 +11,9 @@ class TsReader {
         let value = 0;
 
         while (length > 7) {
-            let index = this.position >> 3;
-            let shift = this.position & 0x07;
-            let mask = Math.pow(2, 8 - shift) - 1;
+            const index = this.position >> 3;
+            const shift = this.position & 0x07;
+            const mask = Math.pow(2, 8 - shift) - 1;
 
             value <<= 8;
             value |= (this.buffer[index] & mask) << shift;
@@ -26,8 +24,8 @@ class TsReader {
         }
 
         while (length > 0) {
-            let index = this.position >> 3;
-            let shift = this.position & 0x07 ^ 0x07;
+            const index = this.position >> 3;
+            const shift = this.position & 0x07 ^ 0x07;
 
             value <<= 1;
             value |= this.buffer[index] >> shift & 0x01;
@@ -43,7 +41,7 @@ class TsReader {
         let value = 0;
 
         while (length > 31) {
-            let bits = (length - 1) % 31 + 1;
+            const bits = (length - 1) % 31 + 1;
 
             value *= 0x80000000;
             value += this.readBitsRaw(bits);
@@ -62,7 +60,7 @@ class TsReader {
             return Buffer.alloc(0);
         }
 
-        let start = this.position >> 3;
+        const start = this.position >> 3;
 
         this.position += length << 3;
 
