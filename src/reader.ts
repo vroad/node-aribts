@@ -1,12 +1,10 @@
-"use strict";
-
 class TsReader {
-    constructor(buffer, position) {
+    constructor(public buffer: Buffer, public position = 0) {
         this.buffer = buffer;
         this.position = position || 0;
     }
 
-    readBitsRaw(length) {
+    readBitsRaw(length: number) {
         if (this.position + length > this.buffer.length << 3) {
             this.position += length;
             return 0;
@@ -41,7 +39,7 @@ class TsReader {
         return value;
     }
 
-    readBits(length) {
+    readBits(length: number) {
         let value = 0;
 
         while (length > 31) {
@@ -58,7 +56,7 @@ class TsReader {
         return value;
     }
 
-    readBytesRaw(length) {
+    readBytesRaw(length: number) {
         if (this.position + length > this.buffer.length << 3) {
             this.position += length;
             return Buffer.alloc(0);
@@ -71,33 +69,33 @@ class TsReader {
         return this.buffer.slice(start, start + length);
     }
 
-    readBytes(length) {
+    readBytes(length: number) {
         return Buffer.from(this.readBytesRaw(length));
     }
 
-    next(length) {
+    next(length: number) {
         this.position += length;
     }
 
-    previous(length) {
+    previous(length: number) {
         this.position -= length;
     }
 
-    bslbf(length) {
+    bslbf(length: number) {
         return this.readBits(length);
     }
 
-    uimsbf(length) {
+    uimsbf(length: number) {
         return this.readBits(length);
     }
 
-    tcimsbf(length) {
+    tcimsbf(length: number) {
         return (-this.readBits(1) << length - 1) | this.readBits(length - 1);
     }
 
-    rpchof(length) {
+    rpchof(length: number) {
         return this.readBits(length);
     }
 }
 
-module.exports = TsReader;
+export = TsReader;
