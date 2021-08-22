@@ -41,14 +41,14 @@ let trnsBuffer: Buffer;
 }
 
 class TsLogo {
-    constructor(public buffer: Uint8Array) {
+    constructor(public buffer: Buffer) {
     }
 
     decode() {
         return TsLogo.decode(this.buffer);
     }
 
-    static decode(buffer: Uint8Array): Uint8Array {
+    static decode(buffer: Buffer): Buffer {
         let pngBufferList = [buffer.slice(0, 33), plteBuffer, trnsBuffer, buffer.slice(33)];
         let pngBufferLength = buffer.length + plteBuffer.length + trnsBuffer.length;
 

@@ -6,7 +6,7 @@ type Minute = number;
 type Second = number;
 
 class TsDate {
-    constructor(public buffer: Uint8Array) {
+    constructor(public buffer: Buffer) {
     }
 
     decode() {

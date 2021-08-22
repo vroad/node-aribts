@@ -1,5 +1,5 @@
 class TsReader {
-    constructor(public buffer: Uint8Array, public position = 0) {
+    constructor(public buffer: Buffer, public position = 0) {
     }
 
     readBitsRaw(length: number) {
@@ -54,10 +54,10 @@ class TsReader {
         return value;
     }
 
-    readBytesRaw(length: number) {
+    readBytesRaw(length: number): Buffer {
         if (this.position + length > this.buffer.length << 3) {
             this.position += length;
-            return new Uint8Array(0);
+            return Buffer.allocUnsafe(0);
         }
 
         const start = this.position >> 3;

@@ -2,7 +2,7 @@ import TsReader = require("./reader");
 import TsWriter = require("./writer");
 
 interface Packet {
-    _raw: Uint8Array;
+    _raw: Buffer;
 
     sync_byte: number;
     transport_error_indicator: number;
@@ -14,11 +14,11 @@ interface Packet {
     continuity_counter: number;
 
     adaptation_field?: AdaptationField;
-    data_byte?: Uint8Array;
+    data_byte?: Buffer;
 }
 
 interface AdaptationField {
-    _raw: Uint8Array;
+    _raw: Buffer;
 
     adaptation_field_length: number;
 
@@ -37,7 +37,7 @@ interface AdaptationField {
     original_program_clock_reference_extension?: number;
     splice_countdown?: number;
     transport_private_data_length?: number;
-    private_data_byte?: Uint8Array;
+    private_data_byte?: Buffer;
     adaptation_field_extension_length?: number;
     ltw_flag?: number;
     piecewise_rate_flag?: number;
@@ -52,7 +52,7 @@ interface AdaptationField {
 }
 
 class TsPacket {
-    constructor(public buffer: Uint8Array) {
+    constructor(public buffer: Buffer) {
     }
 
     decode(): Packet {
@@ -185,7 +185,7 @@ class TsPacket {
         return objPacket as Packet;
     }
 
-    encode(objPacket: Packet): Uint8Array {
+    encode(objPacket: Packet): Buffer {
         const writer = new TsWriter(this.buffer);
 
         writer.bslbf(8, 0x47);
@@ -264,7 +264,7 @@ class TsPacket {
         return this.buffer.slice(0, 188);
     }
 
-    static isPes(buffer: Uint8Array): boolean {
+    static isPes(buffer: Buffer): boolean {
         if ((buffer[3] & 0x10) >> 4 === 0) return null;
 
         const offset = (buffer[3] & 0x20) >> 5 === 1 ? 5 + buffer[4] : 4;
@@ -276,13 +276,13 @@ class TsPacket {
         }
     }
 
-    static getAdaptationField(buffer: Uint8Array): Uint8Array {
+    static getAdaptationField(buffer: Buffer): Buffer {
         if ((buffer[3] & 0x20) >> 5 === 0) return null;
 
         return buffer.slice(4, 5 + buffer[4]);
     }
 
-    static getData(buffer: Uint8Array): Uint8Array {
+    static getData(buffer: Buffer): Buffer {
         if ((buffer[3] & 0x10) >> 4 === 0) return null;
 
         if ((buffer[3] & 0x20) >> 5 === 1) {

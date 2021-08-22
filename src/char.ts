@@ -37,7 +37,7 @@ class TsChar {
 
     sjis: number[] = [];
 
-    constructor(public buffer: Uint8Array) {
+    constructor(public buffer: Buffer) {
     }
 
     decode() {

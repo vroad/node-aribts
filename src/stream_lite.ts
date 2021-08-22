@@ -1,7 +1,22 @@
 import { Writable } from "stream";
 import { TsInfo } from "./info";
 import TsPacket = require("./packet");
-import tsTable = require("./table");
+import {
+    TsTablePat,
+    TsTableCat,
+    TsTablePmt,
+    TsTableDsmcc,
+    TsTableNit,
+    TsTableSdt,
+    TsTableBat,
+    TsTableTdt,
+    TsTableTot,
+    TsTableDit,
+    TsTableSit,
+    TsTableSdtt,
+    TsTableCdt
+} from "./table";
+import { decode as decodeEIT } from "./table/eit";
 
 class TsStreamLite extends Writable {
     packetSize = 188;
@@ -11,7 +26,7 @@ class TsStreamLite extends Writable {
         super();
     }
 
-    _write(buffer: Uint8Array, encoding: string, callback: Function) {
+    _write(buffer: Buffer, encoding: string, callback: Function) {
         const length = buffer.byteLength;
         const packetSize = this.packetSize;
 
@@ -19,10 +34,10 @@ class TsStreamLite extends Writable {
             const packet = buffer.slice(i, i + packetSize);
 
             // Create TsPacket instance
-            let tsPacket = new TsPacket(packet);
+            const tsPacket = new TsPacket(packet);
 
             // Decode basic struct
-            let objBasic = tsPacket.decodeBasic();
+            const objBasic = tsPacket.decodeBasic();
 
             // Check transport_error_indicator
             if (objBasic.transport_error_indicator === 1) continue;
@@ -32,12 +47,12 @@ class TsStreamLite extends Writable {
                 this.info[objBasic.PID] = new TsInfo();
             }
 
-            let info = this.info[objBasic.PID];
+            const info = this.info[objBasic.PID];
             info.packet++;
 
             // Exists data
             if ((objBasic.adaptation_field_control & 0x01) === 1) {
-                let sections = [];
+                const sections = [];
 
                 // Check discontinuity_indicator
                 if (objBasic["adaptation_field"] &&
@@ -48,9 +63,9 @@ class TsStreamLite extends Writable {
 
                 // Check drop
                 if (info.counter !== -1 && objBasic.PID !== 0x1FFF) {
-                    let counter = objBasic.continuity_counter;
-                    let previous = info.counter;
-                    let expected = (previous + 1) & 0x0F;
+                    const counter = objBasic.continuity_counter;
+                    const previous = info.counter;
+                    const expected = (previous + 1) & 0x0F;
                     let check = true;
 
                     if (counter === previous) {
@@ -102,10 +117,10 @@ class TsStreamLite extends Writable {
                             // PSI/SI
                             info.type = 2;
 
-                            let data = TsPacket.getData(packet);
+                            const data = TsPacket.getData(packet);
                             let bytesRead = 0;
 
-                            let pointerField = data[0];
+                            const pointerField = data[0];
                             bytesRead++;
 
                             if (pointerField !== 0 && info.buffer.length !== 0) {
@@ -131,7 +146,7 @@ class TsStreamLite extends Writable {
                             bytesRead += pointerField;
 
                             while (data.length >= bytesRead + 3 && data[bytesRead] !== 0xFF) {
-                                let sectionLength = 3 + ((data[bytesRead + 1] & 0x0F) << 8 | data[bytesRead + 2]);
+                                const sectionLength = 3 + ((data[bytesRead + 1] & 0x0F) << 8 | data[bytesRead + 2]);
 
                                 if (data.length < bytesRead + sectionLength) {
                                     // Add buffer
@@ -154,8 +169,8 @@ class TsStreamLite extends Writable {
 
                             if (info.buffer.length !== 0) {
                                 // Continuing section
-                                let data = TsPacket.getData(packet);
-                                let restLength = info.buffer.entireLength - info.buffer.length;
+                                const data = TsPacket.getData(packet);
+                                const restLength = info.buffer.entireLength - info.buffer.length;
 
                                 if (data.length < restLength) {
                                     // Add buffer
@@ -175,13 +190,13 @@ class TsStreamLite extends Writable {
                         }
                     }
 
-                    for (let section of sections) {
-                        let tableId = section[0];
+                    for (const section of sections) {
+                        const tableId = section[0];
 
                         if (tableId === 0x00) {
                             // PAT
                             if (this.listenerCount("pat")) {
-                                let objPat = new tsTable.TsTablePat(section).decode();
+                                const objPat = new TsTablePat(section).decode();
 
                                 if (objPat !== null) {
                                     this.emit("pat", objBasic.PID, objPat);
@@ -190,7 +205,7 @@ class TsStreamLite extends Writable {
                         } else if (tableId === 0x01) {
                             // CAT
                             if (this.listenerCount("cat")) {
-                                let objCat = new tsTable.TsTableCat(section).decode();
+                                const objCat = new TsTableCat(section).decode();
 
                                 if (objCat !== null) {
                                     this.emit("cat", objBasic.PID, objCat);
@@ -199,7 +214,7 @@ class TsStreamLite extends Writable {
                         } else if (tableId === 0x02) {
                             // PMT
                             if (this.listenerCount("pmt")) {
-                                let objPmt = new tsTable.TsTablePmt(section).decode();
+                                const objPmt = new TsTablePmt(section).decode();
 
                                 if (objPmt !== null) {
                                     this.emit("pmt", objBasic.PID, objPmt);
@@ -208,7 +223,7 @@ class TsStreamLite extends Writable {
                         } else if (tableId >= 0x3A && tableId <= 0x3F) {
                             // DSM-CC
                             if (this.listenerCount("dsmcc")) {
-                                let objDsmcc = new tsTable.TsTableDsmcc(section).decode();
+                                const objDsmcc = new TsTableDsmcc(section).decode();
 
                                 if (objDsmcc !== null) {
                                     this.emit("dsmcc", objBasic.PID, objDsmcc);
@@ -217,7 +232,7 @@ class TsStreamLite extends Writable {
                         } else if (tableId === 0x40 || tableId === 0x41) {
                             // NIT
                             if (this.listenerCount("nit")) {
-                                let objNit = new tsTable.TsTableNit(section).decode();
+                                const objNit = new TsTableNit(section).decode();
 
                                 if (objNit !== null) {
                                     this.emit("nit", objBasic.PID, objNit);
@@ -226,7 +241,7 @@ class TsStreamLite extends Writable {
                         } else if (tableId === 0x42 || tableId === 0x46) {
                             // SDT
                             if (this.listenerCount("sdt")) {
-                                let objSdt = new tsTable.TsTableSdt(section).decode();
+                                const objSdt = new TsTableSdt(section).decode();
 
                                 if (objSdt !== null) {
                                     this.emit("sdt", objBasic.PID, objSdt);
@@ -235,7 +250,7 @@ class TsStreamLite extends Writable {
                         } else if (tableId === 0x4A) {
                             // BAT
                             if (this.listenerCount("bat")) {
-                                let objBat = new tsTable.TsTableNit(section).decode();
+                                const objBat = new TsTableBat(section).decode();
 
                                 if (objBat !== null) {
                                     this.emit("bat", objBasic.PID, objBat);
@@ -244,7 +259,7 @@ class TsStreamLite extends Writable {
                         } else if (tableId >= 0x4E && tableId <= 0x6F) {
                             // EIT
                             if (this.listenerCount("eit")) {
-                                let objEit = new tsTable.TsTableEit(section).decode();
+                                const objEit = decodeEIT(section);
 
                                 if (objEit !== null) {
                                     this.emit("eit", objBasic.PID, objEit);
@@ -253,7 +268,7 @@ class TsStreamLite extends Writable {
                         } else if (tableId === 0x70) {
                             // TDT
                             if (this.listenerCount("tdt")) {
-                                let objTdt = new tsTable.TsTableTdt(section).decode();
+                                const objTdt = new TsTableTdt(section).decode();
 
                                 if (objTdt !== null) {
                                     this.emit("tdt", objBasic.PID, objTdt);
@@ -262,7 +277,7 @@ class TsStreamLite extends Writable {
                         } else if (tableId === 0x73) {
                             // TOT
                             if (this.listenerCount("tot")) {
-                                let objTot = new tsTable.TsTableTot(section).decode();
+                                const objTot = new TsTableTot(section).decode();
 
                                 if (objTot !== null) {
                                     this.emit("tot", objBasic.PID, objTot);
@@ -271,7 +286,7 @@ class TsStreamLite extends Writable {
                         } else if (tableId === 0x7E) {
                             // DIT
                             if (this.listenerCount("dit")) {
-                                let objDit = new tsTable.TsTableDit(section).decode();
+                                const objDit = new TsTableDit(section).decode();
 
                                 if (objDit !== null) {
                                     this.emit("dit", objBasic.PID, objDit);
@@ -280,7 +295,7 @@ class TsStreamLite extends Writable {
                         } else if (tableId === 0x7F) {
                             // SIT
                             if (this.listenerCount("sit")) {
-                                let objSit = new tsTable.TsTableSit(section).decode();
+                                const objSit = new TsTableSit(section).decode();
 
                                 if (objSit !== null) {
                                     this.emit("sit", objBasic.PID, objSit);
@@ -289,7 +304,7 @@ class TsStreamLite extends Writable {
                         } else if (tableId === 0xC3) {
                             // SDTT
                             if (this.listenerCount("sdtt")) {
-                                let objSdtt = new tsTable.TsTableSdtt(section).decode();
+                                const objSdtt = new TsTableSdtt(section).decode();
 
                                 if (objSdtt !== null) {
                                     this.emit("sdtt", objBasic.PID, objSdtt);
@@ -298,7 +313,7 @@ class TsStreamLite extends Writable {
                         } else if (tableId === 0xC8) {
                             // CDT
                             if (this.listenerCount("cdt")) {
-                                let objCdt = new tsTable.TsTableCdt(section).decode();
+                                const objCdt = new TsTableCdt(section).decode();
 
                                 if (objCdt !== null) {
                                     this.emit("cdt", objBasic.PID, objCdt);

@@ -312,7 +312,7 @@ class TsStream extends Transform {
                         } else if (tableId === 0x4A) {
                             // BAT
                             if (this.listenerCount("bat")) {
-                                let objBat = new tsTable.TsTableNit(section).decode();
+                                let objBat = new tsTable.TsTableBat(section).decode();
 
                                 if (objBat !== null) {
                                     this.emit("bat", objBasic.PID, objBat);
@@ -321,7 +321,7 @@ class TsStream extends Transform {
                         } else if (tableId >= 0x4E && tableId <= 0x6F) {
                             // EIT
                             if (this.listenerCount("eit")) {
-                                let objEit = new tsTable.TsTableEit(section).decode();
+                                let objEit = new tsTable.TsTableEit.decode(section);
 
                                 if (objEit !== null) {
                                     this.emit("eit", objBasic.PID, objEit);
