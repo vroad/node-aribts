@@ -11,7 +11,7 @@ export function calc(buffer: Buffer): number {
 }
 
 export function calcToBuffer(buffer: Buffer): Buffer {
-    let result = Buffer.alloc(4);
+    let result = Buffer.allocUnsafe(4);
     result.writeInt32BE(calc(buffer), 0);
     return result;
 }

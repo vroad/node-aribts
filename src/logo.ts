@@ -8,7 +8,7 @@ let trnsBuffer: Buffer;
     let bytesWritten: number;
 
     // PLTE chunk
-    plteBuffer = Buffer.alloc(4 + 4 + logoClut.length * 3 + 4);
+    plteBuffer = Buffer.allocUnsafe(4 + 4 + logoClut.length * 3 + 4);
     bytesWritten = 0;
 
     plteBuffer.writeUInt32BE(logoClut.length * 3, bytesWritten);
@@ -25,7 +25,7 @@ let trnsBuffer: Buffer;
     plteBuffer.writeInt32BE(crc32(plteBuffer.slice(4, bytesWritten)), bytesWritten);
 
     // tRNS chunk
-    trnsBuffer = Buffer.alloc(4 + 4 + logoClut.length + 4);
+    trnsBuffer = Buffer.allocUnsafe(4 + 4 + logoClut.length + 4);
     bytesWritten = 0;
 
     trnsBuffer.writeUInt32BE(logoClut.length, bytesWritten);
