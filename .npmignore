@@ -1,10 +1,14 @@
 node_modules
+.editorconfig
 *.m2ts
 *.tar
 *.log
 *.swp
 *.tmp
+*.tsbuildinfo
 
 /src
 /test
 /sample
+
+/.vscode

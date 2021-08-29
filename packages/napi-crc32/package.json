@@ -1,0 +1,20 @@
+{
+  "private": true,
+  "name": "napi-crc32",
+  "version": "1.0.0",
+  "description": "Internal: MPEG CRC32 Implementation (N-API)",
+  "main": "index.js",
+  "scripts": {
+    "start": "node sample.js",
+    "build": "tsc",
+    "clean": "rimraf build *.js *.map *.d.ts *.tsbuildinfo",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Chinachu/node-aribts.git"
+  },
+  "author": "kanreisa",
+  "license": "MIT",
+  "gypfile": true
+}

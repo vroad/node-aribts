@@ -4,5 +4,8 @@ node_modules
 *.log
 *.swp
 *.tmp
+*.tsbuildinfo
 
 /lib
+
+/.vscode

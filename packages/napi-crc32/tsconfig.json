@@ -12,20 +12,15 @@
     "removeComments": true,
     "module": "commonjs",
     "sourceMap": true,
-    "allowJs": true,
-    "checkJs": false,
     "declaration": true,
-    "incremental": true,
-    "outDir": "lib",
-    "rootDir": "src"
+    "outDir": ".",
+    "rootDir": ".",
+    "composite": true
   },
   "exclude": [
     "node_modules"
   ],
   "include": [
-    "src/**/*"
-  ],
-  "references": [
-    { "path": "packages/napi-crc32" }
+    "index.ts"
   ]
 }

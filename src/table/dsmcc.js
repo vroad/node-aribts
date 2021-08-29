@@ -1,6 +1,6 @@
 "use strict";
 
-const TsCrc32 = require("../crc32");
+const TsCrc32 = require("../../packages/napi-crc32");
 const TsReader = require("../reader");
 const TsDescriptorCompatibility = require("../descriptor/compatibility");
 const TsModuleDescriptors = require("../module_descriptors");
