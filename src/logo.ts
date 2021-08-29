@@ -1,43 +1,41 @@
 import { crc32 } from "@node-rs/crc32";
 import logoClut = require("./logo_clut");
 
-let plteBuffer: Buffer;
-let trnsBuffer: Buffer;
+const PLTE_BUF = Buffer.allocUnsafe(4 + 4 + logoClut.length * 3 + 4);
+const TRNS_BUF = Buffer.allocUnsafe(4 + 4 + logoClut.length + 4);
 
 {
-    let bytesWritten: number;
-
     // PLTE chunk
-    plteBuffer = Buffer.allocUnsafe(4 + 4 + logoClut.length * 3 + 4);
-    bytesWritten = 0;
+    let bytesWritten = 0;
 
-    plteBuffer.writeUInt32BE(logoClut.length * 3, bytesWritten);
+    PLTE_BUF.writeUInt32BE(logoClut.length * 3, bytesWritten);
     bytesWritten += 4;
-    Buffer.from("PLTE").copy(plteBuffer, bytesWritten);
+    Buffer.from("PLTE").copy(PLTE_BUF, bytesWritten);
     bytesWritten += 4;
 
-    for (let palette of logoClut) {
-        plteBuffer.writeUInt8(palette[0], bytesWritten++);
-        plteBuffer.writeUInt8(palette[1], bytesWritten++);
-        plteBuffer.writeUInt8(palette[2], bytesWritten++);
+    for (const palette of logoClut) {
+        PLTE_BUF.writeUInt8(palette[0], bytesWritten++);
+        PLTE_BUF.writeUInt8(palette[1], bytesWritten++);
+        PLTE_BUF.writeUInt8(palette[2], bytesWritten++);
     }
 
-    plteBuffer.writeInt32BE(crc32(plteBuffer.slice(4, bytesWritten)), bytesWritten);
+    PLTE_BUF.writeInt32BE(crc32(PLTE_BUF.slice(4, bytesWritten)), bytesWritten);
+}
 
+{
     // tRNS chunk
-    trnsBuffer = Buffer.allocUnsafe(4 + 4 + logoClut.length + 4);
-    bytesWritten = 0;
+    let bytesWritten = 0;
 
-    trnsBuffer.writeUInt32BE(logoClut.length, bytesWritten);
+    TRNS_BUF.writeUInt32BE(logoClut.length, bytesWritten);
     bytesWritten += 4;
-    Buffer.from("tRNS").copy(trnsBuffer, bytesWritten);
+    Buffer.from("tRNS").copy(TRNS_BUF, bytesWritten);
     bytesWritten += 4;
 
-    for (let palette of logoClut) {
-        trnsBuffer.writeUInt8(palette[3], bytesWritten++);
+    for (const palette of logoClut) {
+        TRNS_BUF.writeUInt8(palette[3], bytesWritten++);
     }
 
-    trnsBuffer.writeInt32BE(crc32(trnsBuffer.slice(4, bytesWritten)), bytesWritten);
+    TRNS_BUF.writeInt32BE(crc32(TRNS_BUF.slice(4, bytesWritten)), bytesWritten);
 }
 
 class TsLogo {
@@ -49,12 +47,10 @@ class TsLogo {
     }
 
     static decode(buffer: Buffer): Buffer {
-        let pngBufferList = [buffer.slice(0, 33), plteBuffer, trnsBuffer, buffer.slice(33)];
-        let pngBufferLength = buffer.length + plteBuffer.length + trnsBuffer.length;
-
-        let pngBuffer = Buffer.concat(pngBufferList, pngBufferLength);
-
-        return pngBuffer;
+        const pngBufferList = [buffer.slice(0, 33), PLTE_BUF, TRNS_BUF, buffer.slice(33)];
+        const pngBufferLength = buffer.length + PLTE_BUF.length + TRNS_BUF.length;
+        
+        return Buffer.concat(pngBufferList, pngBufferLength); // png
     }
 }
 
