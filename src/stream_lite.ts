@@ -1,4 +1,4 @@
-import { Writable } from "stream";
+import { EventEmitter } from "events";
 import { TsInfo } from "./info";
 import TsPacket = require("./packet");
 import {
@@ -18,21 +18,16 @@ import {
 } from "./table";
 import { decode as decodeEIT } from "./table/eit";
 
-class TsStreamLite extends Writable {
-    packetSize = 188;
+class TsStreamLite extends EventEmitter {
     info: { [pid: number]: TsInfo } = {};
 
     constructor() {
         super();
     }
 
-    _write(buffer: Buffer, encoding: string, callback: Function) {
-        const length = buffer.byteLength;
-        const packetSize = this.packetSize;
-
-        for (let i = 0; i < length; i += packetSize) {
-            const packet = buffer.slice(i, i + packetSize);
-
+    write(packets: Buffer[]) {
+        
+        for (const packet of packets) {
             // Create TsPacket instance
             const tsPacket = new TsPacket(packet);
 
@@ -324,12 +319,10 @@ class TsStreamLite extends Writable {
                 }
             }
         }
-
-        callback();
     }
 
-    _flush(callback: Function) {
-        callback();
+    end() {
+        delete this.info;
     }
 }
 
