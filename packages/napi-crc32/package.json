@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "napi-crc32",
+  "name": "@chinachu/napi-crc32",
   "version": "1.0.0",
   "description": "Internal: MPEG CRC32 Implementation (N-API)",
   "main": "index.js",
