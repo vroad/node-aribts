@@ -17,7 +17,7 @@
   "author": "Chinachu Project",
   "license": "MIT",
   "dependencies": {
-    "@chinachu/napi-crc32": "file:./packages/napi-crc32",
+    "@chinachu/napi-ts-crc32": "file:./packages/napi-ts-crc32",
     "@node-rs/crc32": "^1.2.1",
     "bindings": "^1.5.0",
     "iconv-lite": "^0.6.3",

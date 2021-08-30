@@ -26,6 +26,6 @@
     "src/**/*"
   ],
   "references": [
-    { "path": "packages/napi-crc32" }
+    { "path": "packages/napi-ts-crc32" }
   ]
 }

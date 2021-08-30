@@ -1,6 +1,6 @@
 export import TsStream = require("./stream");
 export import TsStreamLite = require("./stream_lite");
-export * as TsCrc32 from "@chinachu/napi-crc32";
+export * as TsCrc32 from "@chinachu/napi-ts-crc32";
 export import TsChar = require("./char");
 export import TsDate = require("./date");
 export import TsLogo = require("./logo");

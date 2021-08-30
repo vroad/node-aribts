@@ -1,4 +1,4 @@
-import { calc } from "@chinachu/napi-crc32";
+import { calc } from "@chinachu/napi-ts-crc32";
 import TsReader = require("../reader");
 import TsDescriptors = require("../descriptors");
 
