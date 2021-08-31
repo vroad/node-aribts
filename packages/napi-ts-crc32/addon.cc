@@ -68,19 +68,17 @@ static const unsigned int crc32Table[256] =
     0xBCB4666D, 0xB8757BDA, 0xB5365D03, 0xB1F740B4
 };
 
-Napi::Number Calc(const Napi::CallbackInfo& info)
+Napi::Value Calc(const Napi::CallbackInfo& info)
 {
     Napi::Env env = info.Env();
 
-    auto buf = info[0].As<Napi::Buffer<uint8_t>>();
-    const int length = buf.Length();
-    const auto data = static_cast<const uint8_t*>(buf.Data());
-    std::vector<uint8_t> vec(data, data + length);
+    const auto &buf = info[0].As<Napi::Buffer<uint8_t>>();
+    const size_t length = buf.Length();
 
     int crc = 0xFFFFFFFF;
-    int i = 0;
+    size_t i = 0;
     while (i < length) {
-        crc = (crc << 8) ^ crc32Table[((crc >> 24) ^ vec[i++]) & 0xFF];
+        crc = (crc << 8) ^ crc32Table[((crc >> 24) ^ buf[i++]) & 0xFF];
     }
 
     return Napi::Number::New(env, crc);
