@@ -5,10 +5,9 @@
   "description": "Internal: MPEG CRC32 Implementation (N-API)",
   "main": "index.js",
   "scripts": {
-    "start": "node sample.js",
     "build": "tsc",
     "clean": "rimraf build *.js *.map *.d.ts *.tsbuildinfo",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --exit test.js"
   },
   "repository": {
     "type": "git",
@@ -16,5 +15,8 @@
   },
   "author": "kanreisa",
   "license": "MIT",
-  "gypfile": true
+  "gypfile": true,
+  "devDependencies": {
+    "aribts": "^1.3.5"
+  }
 }

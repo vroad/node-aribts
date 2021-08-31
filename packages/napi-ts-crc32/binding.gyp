@@ -2,6 +2,8 @@
   "targets": [
     {
       "target_name": "addon",
+      "cflags": ["-march=native"],
+      "cflags_cc": ["-march=native"],
       "cflags!": ["-fno-exceptions"],
       "cflags_cc!": ["-fno-exceptions"],
       "sources": [

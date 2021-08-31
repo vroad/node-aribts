@@ -1,6 +1,6 @@
 const addon = require("bindings")("addon");
 
-interface Calc extends Function {
+export interface Calc extends Function {
     (buffer: Buffer): number;
 }
 

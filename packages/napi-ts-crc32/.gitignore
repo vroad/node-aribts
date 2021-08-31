@@ -4,3 +4,5 @@
 *.js
 *.map
 *.d.ts
+
+!test.js

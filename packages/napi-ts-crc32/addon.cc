@@ -72,19 +72,10 @@ Napi::Number Calc(const Napi::CallbackInfo& info)
 {
     Napi::Env env = info.Env();
 
-    if (info.Length() < 1) {
-        throw Napi::TypeError::New(env, "Wrong number of arguments");
-    }
-    if (!info[0].IsTypedArray()) {
-        throw Napi::TypeError::New(env, "Wrong type of argument");
-    }
-
-    Napi::Uint8Array tArray = info[0].As<Napi::Uint8Array>();
-    const int offset = tArray.ByteOffset();
-    const int length = tArray.ByteLength();
-    Napi::ArrayBuffer aBuffer = tArray.ArrayBuffer();
-    const uint8_t* data = static_cast<const uint8_t*>(aBuffer.Data());
-    std::vector<uint8_t> vec(data + offset, data + offset + length);
+    auto buf = info[0].As<Napi::Buffer<uint8_t>>();
+    const int length = buf.Length();
+    const auto data = static_cast<const uint8_t*>(buf.Data());
+    std::vector<uint8_t> vec(data, data + length);
 
     int crc = 0xFFFFFFFF;
     int i = 0;
@@ -97,8 +88,8 @@ Napi::Number Calc(const Napi::CallbackInfo& info)
 
 Napi::Object Init(Napi::Env env, Napi::Object exports)
 {
-  exports.Set(Napi::String::New(env, "calc"), Napi::Function::New(env, Calc));
-  return exports;
+    exports.Set(Napi::String::New(env, "calc"), Napi::Function::New(env, Calc));
+    return exports;
 }
 
 NODE_API_MODULE(addon, Init)
