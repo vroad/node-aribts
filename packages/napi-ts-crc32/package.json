@@ -9,14 +9,10 @@
     "clean": "rimraf build *.js *.map *.d.ts *.tsbuildinfo",
     "test": "mocha --exit test.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Chinachu/node-aribts.git"
-  },
   "author": "kanreisa",
   "license": "MIT",
-  "gypfile": true,
   "devDependencies": {
     "aribts": "^1.3.5"
-  }
+  },
+  "gypfile": true
 }

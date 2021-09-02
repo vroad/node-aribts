@@ -1,6 +1,6 @@
 "use strict";
 
-const TsCrc32 = require("@chinachu/napi-ts-crc32");
+const TsCrc32 = require("../crc32");
 const TsReader = require("../reader");
 const TsWriter = require("../writer");
 
