@@ -1,6 +1,6 @@
 {
   "name": "@chinachu/aribts",
-  "version": "1.3.5-mirakurun.12",
+  "version": "1.3.5-mirakurun.13",
   "description": "MPEG-2 TS Stream Tool for node",
   "main": "lib/index.js",
   "scripts": {
