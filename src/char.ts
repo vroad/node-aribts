@@ -258,9 +258,18 @@ class TsChar {
                     case charCode.jis_kanji_1:
                     case charCode.jis_kanji_2:
                     case charCode.symbol:
-                    case charCode.kanji:
-                        this.sjis.push(...this.getSjis(this.getNext(),
-                                                       this.getNext()));
+                    case charCode.kanji: {
+                        const first  = this.getNext();
+                        const second = this.getNext();
+                        if (this.useUnicode(first, second)) {
+                          if (this.sjis.length > 0) {
+                            this.result += decode(Buffer.from(this.sjis), "shift-jis");
+                            this.sjis = [];
+                          }
+                          this.result += this.getUnicode(first, second);
+                        } else {
+                          this.sjis.push(...this.getSjis(first, second));
+                        }
 
                         break;
                 }
