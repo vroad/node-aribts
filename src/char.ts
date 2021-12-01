@@ -258,7 +258,7 @@ class TsChar {
                     case charCode.jis_kanji_1:
                     case charCode.jis_kanji_2:
                     case charCode.symbol:
-                    case charCode.kanji: {
+                    case charCode.kanji:
                         const first  = this.getNext();
                         const second = this.getNext();
                         if (this.useUnicode(first, second)) {
