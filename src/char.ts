@@ -36,7 +36,7 @@ class TsChar {
     graphicNormal = true;
 
     sjis: number[] = [];
-    result: string = '';
+    result: string = "";
 
     constructor(public buffer: Buffer) {
     }
@@ -468,11 +468,11 @@ class TsChar {
             if (code >= 0x7521 && code <= 0x764B) {
                 return charTable.gaiji_2_unicode[code];
             } else  if (code >= 0x7A4D && code <= 0x7E7D) {
-                return '';
+                return "";
             }
-            return '';
+            return "";
         } else {
-           return '';
+           return "";
         }
     }
 }
