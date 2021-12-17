@@ -310,7 +310,7 @@ class TsChar {
                     case charCode.jis_kanji_1:
                     case charCode.jis_kanji_2:
                     case charCode.symbol:
-                    case charCode.kanji: {
+                    case charCode.kanji:
                         const first = this.getNext() & 0x7F;
                         const second = this.getNext() & 0x7F;
                         if (this.useUnicode(first, second)) {
@@ -324,7 +324,6 @@ class TsChar {
                         }
 
                         break;
-                    }
                 }
 
                 break;
@@ -343,7 +342,14 @@ class TsChar {
             if (byte2 >= 0x28 && byte2 <= 0x2B) {
                 const byte3 = this.getNext();
 
-                if (byte3 === 0x20) {
+                if (byte2 === 0x2A && byte3 === 0x3B) {
+                    // 2バイトGセット(追加記号)→G2指示制御
+                    // TODO - PR Welcome
+                    this.getNext(); // ESC
+                    this.getNext(); // G2(追加記号)→GR呼び出し
+                    this.getNext(); // 対応する時間が無かったので取り急ぎスキップ
+                    this.getNext(); // 対応する時間が無かったので取り急ぎスキップ
+                } else if (byte3 === 0x20) {
                     // DRCS
                     const byte4 = this.getNext();
 
@@ -351,7 +357,7 @@ class TsChar {
                     this.graphicMode[byte2 - 0x28] = charMode.drcs;
                     this.graphicByte[byte2 - 0x28] = 2;
                 } else if (byte3 === 0x28) {
-                    // Ohter
+                    // Other
                     const byte4 = this.getNext();
 
                     this.graphic[byte2 - 0x28] = byte4;
@@ -427,7 +433,7 @@ class TsChar {
     useUnicode(first: number, second: number): boolean {
         if (first >= 0x75 && second >= 0x21) {
             const code = (first << 8) | second;
-
+            
             if (code >= 0x7521 && code <= 0x764B) {
                 return true;
             } else if (code >= 0x7A4D && code <= 0x7E7D) {
