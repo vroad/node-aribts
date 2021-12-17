@@ -67,8 +67,8 @@ class TsChar {
         }
 
         if (this.sjis.length > 0) {
-          this.result += decode(Buffer.from(this.sjis), "shift-jis");
-          this.sjis = [];
+            this.result += decode(Buffer.from(this.sjis), "shift-jis");
+            this.sjis = [];
         }
 
         return this.result;
@@ -122,7 +122,7 @@ class TsChar {
 
                 break;
 
-            case 0x16 :
+            case 0x16:
                 //PAPF
                 this.position += 1;
 
@@ -259,16 +259,16 @@ class TsChar {
                     case charCode.jis_kanji_2:
                     case charCode.symbol:
                     case charCode.kanji:
-                        const first  = this.getNext();
+                        const first = this.getNext();
                         const second = this.getNext();
                         if (this.useUnicode(first, second)) {
-                          if (this.sjis.length > 0) {
-                            this.result += decode(Buffer.from(this.sjis), "shift-jis");
-                            this.sjis = [];
-                          }
-                          this.result += this.getUnicode(first, second);
+                            if (this.sjis.length > 0) {
+                                this.result += decode(Buffer.from(this.sjis), "shift-jis");
+                                this.sjis = [];
+                            }
+                            this.result += this.getUnicode(first, second);
                         } else {
-                          this.sjis.push(...this.getSjis(first, second));
+                            this.sjis.push(...this.getSjis(first, second));
                         }
 
                         break;
@@ -311,16 +311,16 @@ class TsChar {
                     case charCode.jis_kanji_2:
                     case charCode.symbol:
                     case charCode.kanji: {
-                        const first  = this.getNext() & 0x7F;
+                        const first = this.getNext() & 0x7F;
                         const second = this.getNext() & 0x7F;
                         if (this.useUnicode(first, second)) {
-                          if (this.sjis.length > 0) {
-                            this.result += decode(Buffer.from(this.sjis), "shift-jis");
-                            this.sjis = [];
-                          }
-                          this.result += this.getUnicode(first, second);
+                            if (this.sjis.length > 0) {
+                                this.result += decode(Buffer.from(this.sjis), "shift-jis");
+                                this.sjis = [];
+                            }
+                            this.result += this.getUnicode(first, second);
                         } else {
-                          this.sjis.push(...this.getSjis(first, second));
+                            this.sjis.push(...this.getSjis(first, second));
                         }
 
                         break;
@@ -430,12 +430,12 @@ class TsChar {
 
             if (code >= 0x7521 && code <= 0x764B) {
                 return true;
-            } else  if (code >= 0x7A4D && code <= 0x7E7D) {
+            } else if (code >= 0x7A4D && code <= 0x7E7D) {
                 return false;
             }
             return false;
         } else {
-           return false;
+            return false;
         }
     }
 
@@ -448,7 +448,7 @@ class TsChar {
             } else if (code >= 0x7A4D && code <= 0x7E7D) {
                 return charTable.gaiji_1[code];
             }
-            
+
             return [];
         }
 
@@ -467,12 +467,12 @@ class TsChar {
 
             if (code >= 0x7521 && code <= 0x764B) {
                 return charTable.gaiji_2_unicode[code];
-            } else  if (code >= 0x7A4D && code <= 0x7E7D) {
+            } else if (code >= 0x7A4D && code <= 0x7E7D) {
                 return "";
             }
             return "";
         } else {
-           return "";
+            return "";
         }
     }
 }
