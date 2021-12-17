@@ -24,8 +24,5 @@
   ],
   "include": [
     "src/**/*"
-  ],
-  "references": [
-    { "path": "packages/napi-ts-crc32" }
   ]
 }
