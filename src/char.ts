@@ -426,7 +426,7 @@ class TsChar {
     useUnicode(first: number, second: number): boolean {
         if (first >= 0x75 && second >= 0x21) {
             const code = (first << 8) | second;
-            
+
             if (code >= 0x7521 && code <= 0x764B) {
                 return true;
             } else if (code >= 0x7A4D && code <= 0x7E7D) {
