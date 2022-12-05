@@ -17,7 +17,7 @@
   "author": "Chinachu Project",
   "license": "MIT",
   "dependencies": {
-    "@node-rs/crc32": "1.4.3",
+    "@node-rs/crc32": "1.5.1",
     "iconv-lite": "0.6.3"
   },
   "devDependencies": {
